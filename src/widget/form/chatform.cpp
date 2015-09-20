@@ -107,6 +107,9 @@ ChatForm::ChatForm(Friend* chatFriend)
     connect(screenshotButton, &QPushButton::clicked, this, &ChatForm::onScreenshotClicked);
     connect(callButton, &QPushButton::clicked, this, &ChatForm::onCallTriggered);
     connect(videoButton, &QPushButton::clicked, this, &ChatForm::onVideoCallTriggered);
+#ifdef QTOX_TOXTUN
+    connect(tunButton, &QPushButton::clicked, this, &ChatForm::onTunTriggered);
+#endif
     connect(msgEdit, &ChatTextEdit::enterPressed, this, &ChatForm::onSendTriggered);
     connect(msgEdit, &ChatTextEdit::textChanged, this, &ChatForm::onTextEditChanged);
     connect(core, &Core::fileSendFailed, this, &ChatForm::onFileSendFailed);
@@ -599,6 +602,108 @@ void ChatForm::onVolMuteToggle()
         Style::repolish(volButton);
     }
 }
+
+#ifdef QTOX_TOXTUN
+void ChatForm::onTunTriggered()
+{
+    qDebug() << "onTunTriggered";
+
+    tunButton->disconnect();
+    emit startTun(f->getFriendID());
+
+    tunButton->setObjectName("yellow");
+    tunButton->setToolTip(tr("Close connection"));
+    tunButton->style()->polish(tunButton);
+    connect(tunButton, SIGNAL(clicked()), this, SLOT(onCloseTunTriggered()));
+}
+
+void ChatForm::onAcceptTunTriggered()
+{
+    qDebug() << "onAcceptTunTriggered";
+
+    tunButton->disconnect();
+    emit acceptTun(f->getFriendID());
+
+    tunButton->setObjectName("red");
+    tunButton->setToolTip(tr("Close connection"));
+    tunButton->style()->polish(tunButton);
+    connect(tunButton, SIGNAL(clicked()), this, SLOT(onCloseTunTriggered()));
+}
+
+void ChatForm::onRejectTunTriggered()
+{
+    qDebug() << "onRejectTunTriggered";
+
+    tunButton->disconnect();
+    emit rejectTun(f->getFriendID());
+
+    tunButton->setObjectName("green");
+    tunButton->setToolTip(tr("Open tun connection"));
+    tunButton->style()->polish(tunButton);
+    connect(tunButton, SIGNAL(clicked()), this, SLOT(onTunTriggered()));
+}
+
+void ChatForm::onCloseTunTriggered()
+{
+    qDebug() << "onCloseTunTriggered";
+
+    tunButton->disconnect();
+    emit closeTun(f->getFriendID());
+
+    tunButton->setObjectName("green");
+    tunButton->setToolTip(tr("Open tun connection"));
+    tunButton->style()->polish(tunButton);
+    connect(tunButton, SIGNAL(clicked()), this, SLOT(onTunTriggered()));
+}
+
+void ChatForm::onTunRequested(uint32_t friendId)
+{
+    qDebug() << "onTunRequested";
+
+    tunButton->disconnect();
+
+    tunButton->setObjectName("yellow");
+    tunButton->setToolTip(tr("Open tun connection"));
+    tunButton->style()->polish(tunButton);
+    connect(tunButton, SIGNAL(clicked()), this, SLOT(onAcceptTunTriggered()));
+}
+
+void ChatForm::onTunAccepted(uint32_t friendId)
+{
+    qDebug() << "onTunAccepted";
+
+    tunButton->disconnect();
+
+    tunButton->setObjectName("red");
+    tunButton->setToolTip(tr("Close tun connection"));
+    tunButton->style()->polish(tunButton);
+    connect(tunButton, SIGNAL(clicked()), this, SLOT(onCloseTunTriggered()));
+}
+
+void ChatForm::onTunRejected(uint32_t friendId)
+{
+    qDebug() << "onTunRejected";
+
+    tunButton->disconnect();
+
+    tunButton->setObjectName("green");
+    tunButton->setToolTip(tr("Open tun connection"));
+    tunButton->style()->polish(tunButton);
+    connect(tunButton, SIGNAL(clicked()), this, SLOT(onTunTriggered()));
+}
+
+void ChatForm::onTunClosed(uint32_t friendId)
+{
+    qDebug() << "onTunClosed";
+
+    tunButton->disconnect();
+
+    tunButton->setObjectName("green");
+    tunButton->setToolTip(tr("Open tun connection"));
+    tunButton->style()->polish(tunButton);
+    connect(tunButton, SIGNAL(clicked()), this, SLOT(onTunTriggered()));
+}
+#endif // QTOX_TOXTUN
 
 void ChatForm::onFileSendFailed(uint32_t FriendId, const QString &fname)
 {

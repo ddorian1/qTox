@@ -110,6 +110,10 @@ contains(DISABLE_FILTER_AUDIO, YES) {
      DEFINES += QTOX_FILTER_AUDIO
 }
 
+contains(ENABLE_TOXTUN, YES) {
+     DEFINES += QTOX_TOXTUN
+}
+
 contains(HIGH_DPI, YES) {
     QT_DEVICE_PIXEL_RATIO= auto
     DEFINES += HIGH_DPI
@@ -138,6 +142,10 @@ contains(DEFINES, QTOX_PLATFORM_EXT) {
                src/platform/autorun_osx.cpp
 }
 
+contains(DEFINES, QTOX_TOXTUN) {
+    SOURCES += src/core/coretun.cpp
+}
+
 # Rules for Windows, Mac OSX, and Linux
 win32 {
     RC_FILE = windows/qtox.rc
@@ -153,6 +161,7 @@ win32 {
             LIBS += -lfilteraudio
         }
     }
+    contains(DEFINES, QTOX_TOXTUN) { LIBS += -ltoxtun }
 } else {
     macx {
         BUNDLEID = chat.tox.qtox
@@ -172,6 +181,7 @@ win32 {
         #Dynamic versioning for Info.plist
         INFO_PLIST_PATH = $$shell_quote($${OUT_PWD}/$${TARGET}.app/Contents/Info.plist)
         QMAKE_POST_LINK += /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $${GIT_DESCRIBE}\" $${INFO_PLIST_PATH}
+        contains(DEFINES, QTOX_TOXTUN) { LIBS += -ltoxtun }
     } else {
         android {
             LIBS += -ltoxcore -ltoxav -ltoxencryptsave -ltoxdns
@@ -211,6 +221,8 @@ win32 {
                     LIBS += -lfilteraudio
                 }
             }
+
+            contains(DEFINES, QTOX_TOXTUN) { LIBS += -ltoxtun }
 
             contains(JENKINS, YES) {
                 LIBS = ./libs/lib/libtoxav.a ./libs/lib/libvpx.a ./libs/lib/libopus.a ./libs/lib/libtoxdns.a ./libs/lib/libtoxencryptsave.a ./libs/lib/libtoxcore.a ./libs/lib/libopenal.a ./libs/lib/libsodium.a ./libs/lib/libfilteraudio.a ./libs/lib/libavformat-ffmpeg.so ./libs/lib/libavdevice-ffmpeg.so ./libs/lib/libavcodec-ffmpeg.so ./libs/lib/libavutil-ffmpeg.so ./libs/lib/libswscale-ffmpeg.so -ldl -lX11 -lXss -lqrencode

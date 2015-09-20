@@ -902,6 +902,16 @@ void Widget::addFriend(int friendId, const QString &userId)
     connect(coreav, &CoreAV::avInvite, newfriend->getChatForm(), &ChatForm::onAvInvite, Qt::BlockingQueuedConnection);
     connect(coreav, &CoreAV::avStart, newfriend->getChatForm(), &ChatForm::onAvStart, Qt::BlockingQueuedConnection);
     connect(coreav, &CoreAV::avEnd, newfriend->getChatForm(), &ChatForm::onAvEnd, Qt::BlockingQueuedConnection);
+#ifdef QTOX_TOXTUN
+    connect(newfriend->getChatForm(), &ChatForm::startTun, core, &Core::startTun);
+    connect(newfriend->getChatForm(), &ChatForm::rejectTun, core, &Core::rejectTun);
+    connect(newfriend->getChatForm(), &ChatForm::acceptTun, core, &Core::acceptTun);
+    connect(newfriend->getChatForm(), &ChatForm::closeTun, core, &Core::closeTun);
+    connect(core, &Core::tunRequested, newfriend->getChatForm(), &ChatForm::onTunRequested);
+    connect(core, &Core::tunAccepted, newfriend->getChatForm(), &ChatForm::onTunAccepted);
+    connect(core, &Core::tunRejected, newfriend->getChatForm(), &ChatForm::onTunRejected);
+    connect(core, &Core::tunClosed, newfriend->getChatForm(), &ChatForm::onTunClosed);
+#endif
     connect(core, &Core::friendAvatarChanged, newfriend->getChatForm(), &ChatForm::onAvatarChange);
     connect(core, &Core::friendAvatarChanged, newfriend->getFriendWidget(), &FriendWidget::onAvatarChange);
     connect(core, &Core::friendAvatarRemoved, newfriend->getChatForm(), &ChatForm::onAvatarRemoved);

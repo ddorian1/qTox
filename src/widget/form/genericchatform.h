@@ -119,6 +119,9 @@ protected:
     MaskablePixmapWidget *avatar;
     QWidget *headWidget;
     QPushButton *fileButton, *screenshotButton, *emoteButton, *callButton, *videoButton, *volButton, *micButton;
+#ifdef QTOX_TOXTUN
+    QPushButton *tunButton;
+#endif
     FlyoutOverlayWidget *fileFlyout;
     QVBoxLayout *headTextLayout;
     ChatTextEdit *msgEdit;

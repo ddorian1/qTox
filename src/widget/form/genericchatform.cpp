@@ -90,6 +90,10 @@ GenericChatForm::GenericChatForm(QWidget *parent)
     callButton->setFixedSize(50,40);
     videoButton = new QPushButton();
     videoButton->setFixedSize(50,40);
+#ifdef QTOX_TOXTUN
+    tunButton = new QPushButton();
+    tunButton->setFixedSize(50,40);
+#endif
     volButton = new QPushButton();
     //volButton->setFixedSize(25,20);
     volButton->setToolTip("");
@@ -120,6 +124,11 @@ GenericChatForm::GenericChatForm(QWidget *parent)
 
     videoButton->setObjectName("green");
     videoButton->setStyleSheet(Style::getStylesheet(":/ui/videoButton/videoButton.css"));
+
+#ifdef QTOX_TOXTUN
+    tunButton->setObjectName("green");
+    tunButton->setStyleSheet(Style::getStylesheet(":/ui/tunButton/tunButton.css"));
+#endif
 
     QString volButtonStylesheet = Style::getStylesheet(":/ui/volButton/volButton.css");
     volButton->setObjectName("grey");
@@ -164,6 +173,9 @@ GenericChatForm::GenericChatForm(QWidget *parent)
     buttonsLayout->addLayout(micButtonsLayout, 0, 0, 2, 1, Qt::AlignTop | Qt::AlignRight);
     buttonsLayout->addWidget(callButton, 0, 1, 2, 1, Qt::AlignTop);
     buttonsLayout->addWidget(videoButton, 0, 2, 2, 1, Qt::AlignTop);
+#ifdef QTOX_TOXTUN
+    buttonsLayout->addWidget(tunButton, 0, 3, 2, 1, Qt::AlignTop);
+#endif
     buttonsLayout->setVerticalSpacing(0);
     buttonsLayout->setHorizontalSpacing(4);
 
@@ -184,6 +196,9 @@ GenericChatForm::GenericChatForm(QWidget *parent)
     volButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     callButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     videoButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+#ifdef QTOX_TOXTUN
+    tunButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+#endif
 
     menu.addActions(chatWidget->actions());
     menu.addSeparator();
@@ -207,6 +222,13 @@ GenericChatForm::GenericChatForm(QWidget *parent)
     fileFlyout->setParent(this);
     fileButton->installEventFilter(this);
     fileFlyout->installEventFilter(this);
+
+#ifdef QTOX_TOXTUN
+    if (!Core::getInstance()->toxtunAvaible()) {
+        tunButton->setEnabled(false);
+        tunButton->setObjectName("grey");
+    }
+#endif
 
     retranslateUi();
     Translator::registerHandler(std::bind(&GenericChatForm::retranslateUi, this), this);
@@ -572,6 +594,9 @@ void GenericChatForm::retranslateUi()
     emoteButton->setToolTip(tr("Smileys"));
     fileButton->setToolTip(tr("Send file(s)"));
     screenshotButton->setToolTip(tr("Send a screenshot"));
+#ifdef QTOX_TOXTUN
+    tunButton->setToolTip(tr("Start a tun connection"));
+#endif
     saveChatAction->setText(tr("Save chat log"));
     clearAction->setText(tr("Clear displayed messages"));
 }

@@ -53,6 +53,12 @@ public:
 
 signals:
     void sendFile(uint32_t friendId, QString, QString, long long);
+#ifdef QTOX_TOXTUN
+    void startTun(uint32_t FriendId);
+    void acceptTun(uint32_t FriendId);
+    void closeTun(uint32_t FriendId);
+    void rejectTun(uint32_t FriendId);
+#endif
     void aliasChanged(const QString& alias);
 
 public slots:
@@ -61,6 +67,12 @@ public slots:
     void onAvInvite(uint32_t FriendId, bool video);
     void onAvStart(uint32_t FriendId, bool video);
     void onAvEnd(uint32_t FriendId);
+#ifdef QTOX_TOXTUN
+    void onTunRequested(uint32_t FriendId);
+    void onTunAccepted(uint32_t FriendId);
+    void onTunRejected(uint32_t FriendId);
+    void onTunClosed(uint32_t FriendId);
+#endif
     void onAvatarChange(uint32_t FriendId, const QPixmap& pic);
     void onAvatarRemoved(uint32_t FriendId);
 
@@ -76,6 +88,12 @@ private slots:
     void onRejectCallTriggered();
     void onMicMuteToggle();
     void onVolMuteToggle();
+#ifdef QTOX_TOXTUN
+    void onTunTriggered();
+    void onAcceptTunTriggered();
+    void onRejectTunTriggered();
+    void onCloseTunTriggered();
+#endif
     void onFileSendFailed(uint32_t FriendId, const QString &fname);
     void onLoadHistory();
     void onUpdateTime();

@@ -61,6 +61,9 @@ QThread* Core::coreThread{nullptr};
 
 Core::Core(QThread *CoreThread, Profile& profile) :
     tox(nullptr), av(nullptr), profile(profile), ready{false}
+#ifdef QTOX_TOXTUN
+    ,toxtun(nullptr)
+#endif
 {
     coreThread = CoreThread;
 
@@ -81,6 +84,12 @@ void Core::deadifyTox()
         delete av;
         av = nullptr;
     }
+#ifdef QTOX_TOXTUN
+    if (toxtun)
+    {
+        delete toxtun;
+    }
+#endif
     if (tox)
     {
         tox_kill(tox);
@@ -219,6 +228,15 @@ void Core::makeTox(QByteArray savedata)
         emit failedToStart();
         return;
     }
+
+#ifdef QTOX_TOXTUN
+    toxtun = ToxTun::newToxTunNoExp(tox);
+    if (toxtun == nullptr) {
+        qWarning() << "ToxTun failed to start. Tun connections won't be avaible";
+    } else {
+        toxtun->setCallback(tunCallback, this);
+    }
+#endif
 }
 
 void Core::start()
@@ -343,6 +361,9 @@ void Core::process()
 
     static int tolerance = CORE_DISCONNECT_TOLERANCE;
     tox_iterate(tox);
+#ifdef QTOX_TOXTUN
+    if (toxtun) toxtun->iterate();
+#endif
 
 #ifdef DEBUG
     //we want to see the debug messages immediately
@@ -1228,3 +1249,9 @@ void Core::reset()
 
     start();
 }
+
+#ifdef QTOX_TOXTUN
+bool Core::toxtunAvaible() {
+    return (toxtun != nullptr) ? true : false;
+}
+#endif
