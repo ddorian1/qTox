@@ -1,0 +1,83 @@
+QPushButton#green
+{
+    background-color: #6bc260;
+    background-image: url(":/ui/tunButton/tunButton.svg");
+    background-repeat: none;
+    background-position: center;
+    border: none;
+    border-radius: 5px;
+    width: 50px;
+    height: 40px;
+}
+
+QPushButton#green:hover
+{
+    background-color: #79c76f;
+}
+
+QPushButton#green:pressed
+{
+    background-color: #51b244;
+}
+
+QPushButton#red
+{
+    background-color: #c84e4e;
+    background-image: url(":/ui/tunButton/tunButton.svg");
+    background-repeat: none;
+    background-position: center;
+    border: none;
+    border-radius: 5px;
+    width: 50px;
+    height: 40px;
+}
+
+QPushButton#red:hover
+{
+    background-color: #e87474;
+}
+
+QPushButton#red:pressed
+{
+    background-color: #df3b3b;
+}
+
+QPushButton#yellow
+{
+    background-color: #e6e465;
+    background-image: url(":/ui/tunButton/tunButton.svg");
+    background-repeat: none;
+    background-position: center;
+    border: none;
+    border-radius: 5px;
+    width: 50px;
+    height: 40px;
+}
+
+QPushButton#yellow:hover
+{
+    background-color: #e8e774;
+}
+
+QPushButton#yellow:pressed
+{
+    background-color: #e3e155;
+}
+
+QPushButton#grey
+{
+    background-color: #919191;
+    background-image: url(":/ui/tunButton/tunButton.svg");
+    background-repeat: none;
+    background-position: center;
+    border: none;
+    border-radius: 5px;
+    width: 50px;
+    height: 40px;
+}
+
+QPushButton:focus
+{
+    outline: none;
+}
+

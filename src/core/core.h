@@ -28,6 +28,10 @@
 #include <tox/tox.h>
 #include <tox/toxencryptsave.h>
 
+#ifdef QTOX_TOXTUN
+#include <toxtun/ToxTun.hpp>
+#endif
+
 #include "corestructs.h"
 #include "coredefines.h"
 #include "toxid.h"
@@ -87,6 +91,10 @@ public:
 
     bool isReady(); ///< Most of the API shouldn't be used until Core is ready, call start() first
 
+#ifdef QTOX_TOXTUN
+    bool toxtunAvaible(); ///< true if toxtun is avaible
+#endif
+
 public slots:
     void start(); ///< Initializes the core, must be called before anything else
     void reset(); ///< Reinitialized the core. Must be called from the Core thread, with the GUI thread ready to process events.
@@ -123,6 +131,13 @@ public slots:
     void acceptFileRecvRequest(uint32_t friendId, uint32_t fileNum, QString path);
     void pauseResumeFileSend(uint32_t friendId, uint32_t fileNum);
     void pauseResumeFileRecv(uint32_t friendId, uint32_t fileNum);
+
+#ifdef QTOX_TOXTUN
+    void startTun(uint32_t friendId);
+    void acceptTun(uint32_t friendId);
+    void closeTun(uint32_t friendId);
+    void rejectTun(uint32_t friendId);
+#endif
 
     void setNospam(uint32_t nospam);
 
@@ -191,6 +206,13 @@ signals:
 
     void fileSendFailed(uint32_t friendId, const QString& fname);
 
+#ifdef QTOX_TOXTUN
+    void tunRequested(uint32_t friendId);
+    void tunAccepted(uint32_t friendId);
+    void tunRejected(uint32_t friendId);
+    void tunClosed(uint32_t friendId);
+#endif
+
 private:
     static void onFriendRequest(Tox* tox, const uint8_t* cUserId, const uint8_t* cMessage,
                                 size_t cMessageSize, void* core);
@@ -214,6 +236,10 @@ private:
                                    const uint8_t* title, uint8_t len, void* _core);
     static void onReadReceiptCallback(Tox *tox, uint32_t friendId, uint32_t receipt, void *core);
 
+#ifdef QTOX_TOXTUN
+    static void tunCallback(ToxTun::Event event, uint32_t friendId, void* core);
+#endif
+
     bool checkConnection();
 
     void checkEncryptedHistory();
@@ -230,6 +256,9 @@ private slots:
 private:
     Tox* tox;
     CoreAV* av;
+#ifdef QTOX_TOXTUN
+    ToxTun* toxtun;
+#endif
     QTimer *toxTimer;
     Profile& profile;
     QMutex messageSendMutex;

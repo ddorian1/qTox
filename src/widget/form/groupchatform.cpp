@@ -44,6 +44,10 @@ GroupChatForm::GroupChatForm(Group* chatGroup)
     tabber = new TabCompleter(msgEdit, group);
 
     fileButton->setEnabled(false);
+#ifdef QTOX_TOXTUN
+    tunButton->setEnabled(false);
+    tunButton->setVisible(false);
+#endif
     if (group->isAvGroupchat())
     {
         videoButton->setEnabled(false);
