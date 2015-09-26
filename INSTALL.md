@@ -51,7 +51,8 @@
 | filter_audio | most recent |                                                   |
 | qrencode     | >= 3.0.3    |                                                   |
 | sqlcipher    | >= 3.2.0    |                                                   |
-| libXScrnSaver | >= 1.2 | |
+| libXScrnSaver | >= 1.2     |                                                   |
+| libToxTun    | >= 0.1.0    |                                                   |
 
 
 
