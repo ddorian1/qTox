@@ -132,6 +132,9 @@ private:
     void stopCounter();
     QString secondsToDHMS(quint32 duration);
     CallConfirmWidget *callConfirm;
+#ifdef QTOX_TOXTUN
+    CallConfirmWidget *tunConfirm;
+#endif
     void enableCallButtons();
     void disableCallButtons();
     bool isTyping;

@@ -31,7 +31,7 @@
 #include <QRect>
 #include <QPalette>
 
-CallConfirmWidget::CallConfirmWidget(const QWidget *Anchor, const Friend& f) :
+CallConfirmWidget::CallConfirmWidget(const QWidget *Anchor, const Friend& f, const QString &string) :
     QWidget(), anchor(Anchor), f(f),
     rectW{120}, rectH{85},
     spikeW{30}, spikeH{15},
@@ -45,7 +45,7 @@ CallConfirmWidget::CallConfirmWidget(const QWidget *Anchor, const Friend& f) :
     setPalette(palette);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    QLabel *callLabel = new QLabel(QObject::tr("Incoming call..."), this);
+    QLabel *callLabel = new QLabel(string, this);
     callLabel->setStyleSheet("color: white");
     callLabel->setWordWrap(true);
     callLabel->setAlignment(Qt::AlignHCenter);

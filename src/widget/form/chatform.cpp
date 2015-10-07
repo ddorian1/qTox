@@ -81,6 +81,9 @@ ChatForm::ChatForm(Friend* chatFriend)
     statusMessageLabel->setTextFormat(Qt::PlainText);
 
     callConfirm = nullptr;
+#ifdef QTOX_TOXTUN
+    tunConfirm = nullptr;
+#endif
     offlineEngine = new OfflineMsgEngine(f);
 
     typingTimer.setSingleShot(true);
@@ -135,6 +138,9 @@ ChatForm::~ChatForm()
     Translator::unregister(this);
     delete netcam;
     delete callConfirm;
+#ifdef QTOX_TOXTUN
+    delete tunConfirm;
+#endif
     delete offlineEngine;
 }
 
@@ -269,7 +275,7 @@ void ChatForm::onAvInvite(uint32_t FriendId, bool video)
     disableCallButtons();
     if (video)
     {
-        callConfirm = new CallConfirmWidget(videoButton, *f);
+        callConfirm = new CallConfirmWidget(videoButton, *f, QObject::tr("Incoming call..."));
         videoButton->setObjectName("yellow");
         videoButton->setToolTip(tr("Accept video call"));
         videoButton->style()->polish(videoButton);
@@ -277,7 +283,7 @@ void ChatForm::onAvInvite(uint32_t FriendId, bool video)
     }
     else
     {
-        callConfirm = new CallConfirmWidget(callButton, *f);
+        callConfirm = new CallConfirmWidget(callButton, *f, QObject::tr("Incoming call..."));
         callButton->setObjectName("yellow");
         callButton->setToolTip(tr("Accept audio call"));
         callButton->style()->polish(callButton);
@@ -621,6 +627,11 @@ void ChatForm::onAcceptTunTriggered()
 {
     qDebug() << "onAcceptTunTriggered";
 
+    if (tunConfirm) {
+        delete tunConfirm;
+        tunConfirm = nullptr;
+    }
+
     tunButton->disconnect();
     emit acceptTun(f->getFriendID());
 
@@ -633,6 +644,11 @@ void ChatForm::onAcceptTunTriggered()
 void ChatForm::onRejectTunTriggered()
 {
     qDebug() << "onRejectTunTriggered";
+
+    if (tunConfirm) {
+        delete tunConfirm;
+        tunConfirm = nullptr;
+    }
 
     tunButton->disconnect();
     emit rejectTun(f->getFriendID());
@@ -658,18 +674,38 @@ void ChatForm::onCloseTunTriggered()
 
 void ChatForm::onTunRequested(uint32_t friendId)
 {
+    if (friendId != f->getFriendID())
+        return;
+
     qDebug() << "onTunRequested";
 
     tunButton->disconnect();
+
+    if (tunConfirm) {
+        delete tunConfirm;
+        tunConfirm = nullptr;
+    }
+
+    tunConfirm = new CallConfirmWidget(tunButton, *f, QObject::tr("Incoming tun request..."));
+    if (f->getFriendWidget()->chatFormIsSet(false))
+        tunConfirm->show();
+
+    connect(tunConfirm, &CallConfirmWidget::accepted, this, &ChatForm::onAcceptTunTriggered);
+    connect(tunConfirm, &CallConfirmWidget::rejected, this, &ChatForm::onRejectTunTriggered);
 
     tunButton->setObjectName("yellow");
     tunButton->setToolTip(tr("Open tun connection"));
     tunButton->style()->polish(tunButton);
     connect(tunButton, SIGNAL(clicked()), this, SLOT(onAcceptTunTriggered()));
+
+    Widget::getInstance()->newFriendMessageAlert(friendId);
 }
 
 void ChatForm::onTunAccepted(uint32_t friendId)
 {
+    if (friendId != f->getFriendID())
+        return;
+
     qDebug() << "onTunAccepted";
 
     tunButton->disconnect();
@@ -678,10 +714,15 @@ void ChatForm::onTunAccepted(uint32_t friendId)
     tunButton->setToolTip(tr("Close tun connection"));
     tunButton->style()->polish(tunButton);
     connect(tunButton, SIGNAL(clicked()), this, SLOT(onCloseTunTriggered()));
+
+    Widget::getInstance()->newFriendMessageAlert(friendId);
 }
 
 void ChatForm::onTunRejected(uint32_t friendId)
 {
+    if (friendId != f->getFriendID())
+        return;
+
     qDebug() << "onTunRejected";
 
     tunButton->disconnect();
@@ -690,11 +731,21 @@ void ChatForm::onTunRejected(uint32_t friendId)
     tunButton->setToolTip(tr("Open tun connection"));
     tunButton->style()->polish(tunButton);
     connect(tunButton, SIGNAL(clicked()), this, SLOT(onTunTriggered()));
+
+    Widget::getInstance()->newFriendMessageAlert(friendId);
 }
 
 void ChatForm::onTunClosed(uint32_t friendId)
 {
+    if (friendId != f->getFriendID())
+        return;
+
     qDebug() << "onTunClosed";
+
+    if (tunConfirm) {
+        delete tunConfirm;
+        tunConfirm = nullptr;
+    }
 
     tunButton->disconnect();
 
@@ -702,6 +753,8 @@ void ChatForm::onTunClosed(uint32_t friendId)
     tunButton->setToolTip(tr("Open tun connection"));
     tunButton->style()->polish(tunButton);
     connect(tunButton, SIGNAL(clicked()), this, SLOT(onTunTriggered()));
+
+    Widget::getInstance()->newFriendMessageAlert(friendId);
 }
 #endif // QTOX_TOXTUN
 
@@ -999,12 +1052,22 @@ void ChatForm::show(ContentLayout* contentLayout)
 
     if (callConfirm)
         callConfirm->show();
+
+#ifdef QTOX_TOXTUN
+    if (tunConfirm)
+        tunConfirm->show();
+#endif
 }
 
 void ChatForm::showEvent(QShowEvent* event)
 {
     if (callConfirm)
         callConfirm->show();
+
+#ifdef QTOX_TOXTUN
+    if (tunConfirm)
+        tunConfirm->show();
+#endif
 
     GenericChatForm::showEvent(event);
 }
@@ -1013,6 +1076,11 @@ void ChatForm::hideEvent(QHideEvent* event)
 {
     if (callConfirm)
         callConfirm->hide();
+
+#ifdef QTOX_TOXTUN
+    if (tunConfirm)
+        tunConfirm->hide();
+#endif
 
     GenericChatForm::hideEvent(event);
 }

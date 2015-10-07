@@ -37,7 +37,7 @@ class CallConfirmWidget final : public QWidget
 {
     Q_OBJECT
 public:
-    explicit CallConfirmWidget(const QWidget *Anchor, const Friend& f);
+    explicit CallConfirmWidget(const QWidget *Anchor, const Friend& f, const QString &string);
 
 signals:
     void accepted();
