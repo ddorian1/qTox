@@ -29,7 +29,7 @@
 #include <tox/toxencryptsave.h>
 
 #ifdef QTOX_TOXTUN
-#include <toxtun/ToxTun.hpp>
+#include <toxtun/ToxTunC.h>
 #endif
 
 #include "corestructs.h"
@@ -90,10 +90,6 @@ public:
     static QByteArray decryptData(const QByteArray& data); ///< Uses the default profile's key
 
     bool isReady(); ///< Most of the API shouldn't be used until Core is ready, call start() first
-
-#ifdef QTOX_TOXTUN
-    bool toxtunAvaible(); ///< true if toxtun is avaible
-#endif
 
 public slots:
     void start(); ///< Initializes the core, must be called before anything else
@@ -237,7 +233,7 @@ private:
     static void onReadReceiptCallback(Tox *tox, uint32_t friendId, uint32_t receipt, void *core);
 
 #ifdef QTOX_TOXTUN
-    static void tunCallback(ToxTun::Event event, uint32_t friendId, void* core);
+    static void tunCallback(enum toxtun_event event, uint32_t friendId, void* core);
 #endif
 
     bool checkConnection();
@@ -257,7 +253,7 @@ private:
     Tox* tox;
     CoreAV* av;
 #ifdef QTOX_TOXTUN
-    ToxTun* toxtun;
+    void* toxtun;
 #endif
     QTimer *toxTimer;
     Profile& profile;

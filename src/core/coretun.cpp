@@ -21,18 +21,18 @@
 #include "core.h"
 #include <QDebug>
 
-void Core::tunCallback(ToxTun::Event event, uint32_t friendId, void* coreVoid) {
+void Core::tunCallback(enum toxtun_event event, uint32_t friendId, void* coreVoid) {
     Core *core = static_cast<Core*>(coreVoid);
 
     switch(event) {
-        case ToxTun::Event::ConnectionRequested:
+        case TOXTUN_CONNECTION_REQUESTED:
             emit core->tunRequested(friendId);
             break;
-        case ToxTun::Event::ConnectionAccepted:
+        case TOXTUN_CONNECTION_ACCEPTED:
             emit core->tunAccepted(friendId);
             break;
-        case ToxTun::Event::ConnectionRejected:
-        case ToxTun::Event::ConnectionClosed:
+        case TOXTUN_CONNECTION_REJECTED:
+        case TOXTUN_CONNECTION_CLOSED:
             emit core->tunClosed(friendId);
             break;
         default:
@@ -42,28 +42,32 @@ void Core::tunCallback(ToxTun::Event event, uint32_t friendId, void* coreVoid) {
 
 void Core::startTun(uint32_t friendId)
 {
-    if (!toxtun) return;
-    toxtun->sendConnectionRequest(friendId);
-    qDebug() << QString("Requesting tun connection to %1").arg(friendId);
+    if (toxtun_send_connection_request(toxtun, friendId)) {
+        qDebug() << QString("Requesting tun connection to %1").arg(friendId);
+    } else {
+        qWarning() << toxtun_get_last_error(toxtun);
+        emit tunClosed(friendId);
+    }
 }
 
 void Core::acceptTun(uint32_t friendId)
 {
-    if (!toxtun) return;
-    toxtun->acceptConnection(friendId);
-    qDebug() << QString("Accpeted connection from %1").arg(friendId);
+    if (toxtun_accept_connection(toxtun, friendId)) {
+        qDebug() << QString("Accpeted connection from %1").arg(friendId);
+    } else {
+        qWarning() << toxtun_get_last_error(toxtun);
+        emit tunClosed(friendId);
+    }
 }
 
 void Core::closeTun(uint32_t friendId)
 {
-    if (!toxtun) return;
-    toxtun->closeConnection();
+    toxtun_close_connection(toxtun, friendId);
     qDebug() << QString("Closing connection to %1").arg(friendId);
 }
 
 void Core::rejectTun(uint32_t friendId)
 {
-    if (!toxtun) return;
-    toxtun->rejectConnection(friendId);
+    toxtun_reject_connection(toxtun, friendId);
     qDebug() << QString("Rejecting connection to %1").arg(friendId);
 }
