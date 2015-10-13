@@ -216,13 +216,19 @@ win32 {
 
             contains(DEFINES, QTOX_FILTER_AUDIO) {
                 contains(STATICPKG, YES) {
-                    LIBS += -Wl,-Bstatic -lfilteraudio
+                    LIBS += -Wl,-Bstatic -lfilteraudio -Wl,-Bdynamic
                 } else {
                     LIBS += -lfilteraudio
                 }
             }
 
-            contains(DEFINES, QTOX_TOXTUN) { LIBS += -ltoxtun }
+            contains(DEFINES, QTOX_TOXTUN) {
+                contains(STATICPKG, YES) {
+                    LIBS += -Wl,-Bstatic -ltoxtun -Wl,-Bdynamic
+                } else {
+                    LIBS += -ltoxtun
+                }
+            }
 
             contains(JENKINS, YES) {
                 LIBS = ./libs/lib/libtoxav.a ./libs/lib/libvpx.a ./libs/lib/libopus.a ./libs/lib/libtoxdns.a ./libs/lib/libtoxencryptsave.a ./libs/lib/libtoxcore.a ./libs/lib/libopenal.a ./libs/lib/libsodium.a ./libs/lib/libfilteraudio.a ./libs/lib/libavformat-ffmpeg.so ./libs/lib/libavdevice-ffmpeg.so ./libs/lib/libavcodec-ffmpeg.so ./libs/lib/libavutil-ffmpeg.so ./libs/lib/libswscale-ffmpeg.so -ldl -lX11 -lXss -lqrencode

@@ -87,7 +87,8 @@ void Core::deadifyTox()
 #ifdef QTOX_TOXTUN
     if (toxtun)
     {
-        delete toxtun;
+        toxtun_kill(toxtun);
+        toxtun = nullptr;
     }
 #endif
     if (tox)
@@ -230,12 +231,11 @@ void Core::makeTox(QByteArray savedata)
     }
 
 #ifdef QTOX_TOXTUN
-    toxtun = ToxTun::newToxTunNoExp(tox);
+    toxtun = toxtun_new(tox);
     if (toxtun == nullptr) {
-        qWarning() << "ToxTun failed to start. Tun connections won't be avaible";
-    } else {
-        toxtun->setCallback(tunCallback, this);
+        qCritical() << "ToxTun failed to start";
     }
+    toxtun_set_callback(toxtun, tunCallback, this);
 #endif
 }
 
@@ -362,7 +362,7 @@ void Core::process()
     static int tolerance = CORE_DISCONNECT_TOLERANCE;
     tox_iterate(tox);
 #ifdef QTOX_TOXTUN
-    if (toxtun) toxtun->iterate();
+    toxtun_iterate(toxtun);
 #endif
 
 #ifdef DEBUG
@@ -1249,9 +1249,3 @@ void Core::reset()
 
     start();
 }
-
-#ifdef QTOX_TOXTUN
-bool Core::toxtunAvaible() {
-    return (toxtun != nullptr) ? true : false;
-}
-#endif

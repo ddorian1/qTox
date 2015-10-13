@@ -223,13 +223,6 @@ GenericChatForm::GenericChatForm(QWidget *parent)
     fileButton->installEventFilter(this);
     fileFlyout->installEventFilter(this);
 
-#ifdef QTOX_TOXTUN
-    if (!Core::getInstance()->toxtunAvaible()) {
-        tunButton->setEnabled(false);
-        tunButton->setObjectName("grey");
-    }
-#endif
-
     retranslateUi();
     Translator::registerHandler(std::bind(&GenericChatForm::retranslateUi, this), this);
 
